@@ -10,7 +10,7 @@ const openai = new OpenAI({
 async function hitOpenAiApi(prompt: string): Promise<string | undefined> {
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-16k',
+      model: 'gpt-4o-mini',
       stream: false,
       temperature: 0.5,
       messages: [
