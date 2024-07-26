@@ -197,57 +197,68 @@ async function hitOpenAiApiTest(prompt: string): Promise<string | undefined> {
 
 const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | undefined> => {
   try {
-      const gptResponse = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-              {
-                  role: 'system',
-                  content: `
-                      You are a professional IT specialist who knows all IT events.
-                      You should recommend events to a user based on their preferences.
-                      You will receive an input array of events and their descriptions.
-                      For example, a single object may look something like this:
-                      {
-                          "_id": "6699664927fb8fa5acb374aa",
-                          "title": "Название хакатона",
-                          "displayed_location": {"icon": "globe", "location": "Online"},
-                          "open_state": "upcoming",
-                          "thumbnail_url": "//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/002/951/096/datas/medium_square.png",
-                          "url": "https://innovatex-hackathon.devpost.com/",
-                          "time_left_to_submission": "Upcoming",
-                          "submission_period_dates": "Jul 25 - 29, 2024",
-                          "prize_amount": "$6,000",
-                          "registrations_count": 16,
-                          "organization_name": "InnovativeX",
-                          "invite_only": false,
-                          "themes": [
-                              {"id": 23, "name": "Beginner Friendly"},
-                              {"id": 17, "name": "Low/No Code"},
-                              {"id": 22, "name": "Open Ended"}
-                          ],
-                          "score": 0.6319528818130493
-                      }
-                      User will write their preferences in text format. You should consider this and recommend the tech events based on the user's preferences.
-                      Return at least 9 the most suitable events in the following JSON format:
-                  `
-              },
-              {
-                  role: 'user',
-                  content: `
-                  This is user preference: ${prompt}
-                  Here are the events: ${JSON.stringify(events)}`
-              }
-          ],
-          max_tokens: 1500  // Adjust based on expected response size
-      });
+    console.log('Sending request to OpenAI API with prompt:', prompt);
+    console.log('Events data being sent:', events);
 
-      const content = gptResponse.choices[0]?.message?.content ?? undefined;
-      return content;
-  } catch (error) {
-      console.error('Error hitting OpenAI API:', error);
+    const gptResponse = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `
+            You are a professional IT specialist who knows all IT events.
+            You should recommend events to a user based on their preferences.
+            You will receive an input array of events and their descriptions.
+            For example, a single object may look something like this:
+            {
+                "_id": "6699664927fb8fa5acb374aa",
+                "title": "Название хакатона",
+                "displayed_location": {"icon": "globe", "location": "Online"},
+                "open_state": "upcoming",
+                "thumbnail_url": "//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/002/951/096/datas/medium_square.png",
+                "url": "https://innovatex-hackathon.devpost.com/",
+                "time_left_to_submission": "Upcoming",
+                "submission_period_dates": "Jul 25 - 29, 2024",
+                "prize_amount": "$6,000",
+                "registrations_count": 16,
+                "organization_name": "InnovativeX",
+                "invite_only": false,
+                "themes": [
+                    {"id": 23, "name": "Beginner Friendly"},
+                    {"id": 17, "name": "Low/No Code"},
+                    {"id": 22, "name": "Open Ended"}
+                ],
+                "score": 0.6319528818130493
+            }
+            User will write their preferences in text format. You should consider this and recommend the tech events based on the user's preferences.
+            Return at least 9 of the most suitable events in the following JSON format:
+          `
+        },
+        {
+          role: 'user',
+          content: `
+            This is user preference: ${prompt}
+            Here are the events: ${JSON.stringify(events)}`
+        }
+      ],
+      max_tokens: 1500  // Adjust based on expected response size
+    });
+
+    if (!gptResponse || !gptResponse.choices || gptResponse.choices.length === 0) {
+      console.error('No choices received in the response from OpenAI API');
       return undefined;
+    }
+
+    const content = gptResponse.choices[0].message?.content?.trim();
+    console.log('Received content from OpenAI API:', content);
+
+    return content;
+  } catch (error) {
+    console.error('Error hitting OpenAI API:', error);
+    return undefined;
   }
 };
+
 
 
 

@@ -269,148 +269,101 @@ class EventService {
 //   }
 
 async getTopEvents(query: string) {
-    try {
-        await this.client.connect();
-        const db = this.client.db('main');
-        const collection = db.collection('events');
+  try {
+    await this.client.connect();
+    const db = this.client.db('main');
+    const collection = db.collection('events');
 
-        const embedding = await createEmbedding(query);
-        if (!embedding) {
-            throw new Error('Failed to create embedding');
-        }
-
-        const currentDate = new Date();
-
-        const events = await collection.aggregate([
-            {
-                '$vectorSearch': {
-                    'index': 'default',
-                    'path': 'embedding',
-                    'queryVector': embedding,
-                    'numCandidates': 150,
-                    'limit': 20
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    title: 1,
-                    description: 1,
-                    displayed_location: 1,
-                    open_state: 1,
-                    thumbnail_url: 1,
-                    url: 1,
-                    time_left_to_submission: 1,
-                    submission_period_dates: 1,
-                    themes: { $map: { input: "$themes", as: "theme", in: { name: "$$theme.name" } } },
-                    prize_amount: 1,
-                    registrations_count: 1,
-                    featured: 1,
-                    organization_name: 1,
-                    winners_announced: 1,
-                    submission_gallery_url: 1,
-                    start_a_submission_url: 1,
-                    invite_only: 1,
-                    eligibility_requirement_invite_only_description: 1,
-                    managed_by_devpost_badge: 1,
-                    score: { $meta: 'searchScore' },
-                }
-            }
-        ]).toArray();
-
-        console.log('Fetched events:', events);
-
-        const topEvents = events.sort((a, b) => b.score - a.score);
-
-        return topEvents;
-    } catch (err) {
-        console.error('Error fetching top events:', err);
-        throw new Error('Internal server error');
-    } finally {
-        await this.client.close();
+    const embedding = await createEmbedding(query);
+    if (!embedding) {
+      throw new Error('Failed to create embedding');
     }
+
+    const currentDate = new Date();
+
+    const events = await collection.aggregate([
+      {
+        '$vectorSearch': {
+          'index': 'default',
+          'path': 'embedding',
+          'queryVector': embedding,
+          'numCandidates': 150,
+          'limit': 20
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          displayed_location: 1,
+          open_state: 1,
+          thumbnail_url: 1,
+          url: 1,
+          time_left_to_submission: 1,
+          submission_period_dates: 1,
+          themes: { $map: { input: "$themes", as: "theme", in: { name: "$$theme.name" } } },
+          prize_amount: 1,
+          registrations_count: 1,
+          featured: 1,
+          organization_name: 1,
+          winners_announced: 1,
+          submission_gallery_url: 1,
+          start_a_submission_url: 1,
+          invite_only: 1,
+          eligibility_requirement_invite_only_description: 1,
+          managed_by_devpost_badge: 1,
+          score: { $meta: 'searchScore' },
+        }
+      }
+    ]).toArray();
+
+    console.log('Fetched events:', events);
+
+    const topEvents = events.sort((a, b) => b.score - a.score);
+
+    return topEvents;
+  } catch (err) {
+    console.error('Error fetching top events:', err);
+    throw new Error('Internal server error');
+  } finally {
+    await this.client.close();
+  }
 }
 
-  
 async getSuitableEvents(query: string) {
-    try {
-        const topEvents = await this.getTopEvents(query);
+  try {
+    const topEvents = await this.getTopEvents(query);
 
-        if (!topEvents || topEvents.length === 0) {
-            console.log('No events found after query.');
-            return { topEvents: [], selectedEvents: [] };
-        }
-
-        const prompt = `Based on the query "${query}"
-        , here is a list of suitable IT events:
-        ${topEvents.map(event => `Title: ${event.title}
-        Location: ${event.displayed_location?.location || 'Not Available'}
-        Description: ${event.description || 'Not Available'}
-        Status: ${event.open_state || 'Not Available'}
-        Submission Deadline: ${event.time_left_to_submission || 'Not Available'}
-        Prize Amount: ${event.prize_amount || 'Not Available'}
-        URL: ${event.url}`).join('\n\n')}
-
-        Please select and return the most suitable events for the user in the following JSON array format:
-        [
-            {
-                "_id": "Event ID",
-                "title": "Event Title",
-                "displayed_location": "Event Location" || "Not Available",
-                "open_state": "Event Status" || "Not Available",
-                "thumbnail_url": "Thumbnail URL" || "Not Available",
-                "url": "Event URL",
-                "time_left_to_submission": "Submission Deadline" || "Not Available",
-                "submission_period_dates": "Submission Period Dates" || "Not Available",
-                "prize_amount": "Prize Amount" || "Not Available",
-                "registrations_count": "Registration Count" || "Not Available",
-                "featured": "Featured" || "Not Available",
-                "organization_name": "Organization Name" || "Not Available",
-                "description": "Event description" || "Not Available",
-                "themes": [
-                    {
-                        "name": "Theme Name"
-                    }
-                ] || "Not Available",
-                "score": "Event Score"
-            }
-        ]`;
-
-        const selectedEventsResponse: string | undefined = await hitOpenAiApiNew(prompt, topEvents);
-
-        if (!selectedEventsResponse || typeof selectedEventsResponse !== 'string') {
-            throw new Error('Invalid response from OpenAI API.');
-        }
-
-        // Log the raw response for debugging
-        console.log('Raw response from OpenAI:', selectedEventsResponse);
-
-        let cleanedResponse = selectedEventsResponse.trim();
-        if (cleanedResponse.startsWith('```') && cleanedResponse.endsWith('```')) {
-            cleanedResponse = cleanedResponse.slice(3, -3).trim();
-        }
-
-        let selectedEvents: any[] = [];
-        try {
-            selectedEvents = JSON.parse(cleanedResponse);
-        } catch (error) {
-            console.error('Failed to parse selected events JSON:', error);
-            console.log('Cleaned response:', cleanedResponse);  // Additional logging to see the response before parsing
-            throw new Error('Failed to parse the selected events data.');
-        }
-
-        console.log('Parsed selected events:', selectedEvents);
-
-        return { topEvents, selectedEvents };
-    } catch (err) {
-        console.error('Error fetching suitable events:', err);
-        throw new Error('Internal server error');
+    if (!topEvents || topEvents.length === 0) {
+      console.log('No events found after query.');
+      return { topEvents: [], selectedEvents: [] };
     }
+
+    const response = await hitOpenAiApiNew(query, topEvents);
+
+    if (!response) {
+      throw new Error('Failed to get a valid response from OpenAI API');
+    }
+
+    // Extract JSON content from the response
+    const jsonResponseMatch = response.match(/```json\n([\s\S]*?)\n```/);
+    if (!jsonResponseMatch) {
+      throw new Error('Invalid JSON format in the response');
+    }
+
+    const jsonResponse = jsonResponseMatch[1];
+    const selectedEvents = JSON.parse(jsonResponse);
+
+    return {
+      topEvents,
+      selectedEvents
+    };
+  } catch (err) {
+    console.error('Error getting suitable events:', err);
+    throw new Error('Internal server error');
+  }
 }
-
-
-
-
 
   
   
