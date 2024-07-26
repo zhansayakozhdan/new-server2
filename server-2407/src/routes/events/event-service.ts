@@ -288,7 +288,7 @@ async getTopEvents(query: string) {
           'path': 'embedding',
           'queryVector': embedding,
           'numCandidates': 150,
-          'limit': 20
+          'limit': 15
         }
       },
       {

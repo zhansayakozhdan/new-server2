@@ -231,7 +231,9 @@ const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | 
                 "score": 0.6319528818130493
             }
             User will write their preferences in text format. You should consider this and recommend the tech events based on the user's preferences.
-            Return at least 9 of the most suitable events in the following JSON format:
+            Do not invent non-existent events that are not on the list, take only those suitable events from my list.
+            Add the reason field there and specify the reason for choosing this event based on the user's request and also document.
+            Return at least 5 of the most suitable events in the following JSON format:
           `
         },
         {
@@ -258,8 +260,6 @@ const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | 
     return undefined;
   }
 };
-
-
 
 
 

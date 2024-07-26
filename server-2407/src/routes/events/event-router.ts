@@ -10,7 +10,7 @@ const eventController = new EventController(eventService)
 
 eventRouter.get('/', eventController.getAllEvents)
 eventRouter.get('/:id', eventController.getEventById);
-eventRouter.get('/by-url', eventController.getEventByUrl);
+eventRouter.get('/get/by-url', eventController.getEventByUrl);
 eventRouter.post('/suitable', eventController.getSuitableEvents);
 
 // eventRouter.post('/register', authController.registerUser)
