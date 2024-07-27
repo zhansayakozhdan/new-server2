@@ -119,7 +119,7 @@ class AuthService {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: 'http://localhost:5002/api/v5/auth/google/callback'
+  callbackURL: `${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google/callback`
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await UserModel.findOne({ googleId: profile.id });

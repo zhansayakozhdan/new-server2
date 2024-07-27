@@ -14,7 +14,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Logic to check if the user is authenticated
     const checkAuth = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/v1/google-auth/check`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google-auth/check`, {
           credentials: 'include',
         });
         if (response.status === 200) {

@@ -117,7 +117,7 @@ const SignUp = () => {
         e.preventDefault(); // Prevent default form submission
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5002/api/v5/auth/register', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
