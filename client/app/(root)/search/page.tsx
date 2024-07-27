@@ -1,15 +1,14 @@
 "use client"
-import HackathonSearch from '@/components/shared/HackathonSearch';
+import EventSearch from '@/components/shared/EventSearch';
 import React from 'react';
 
 
 const SearchPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-100 py-8">
-            <div className="container mx-auto">
-                <h1 className="text-3xl font-bold text-center mb-2">Напишите о себе</h1>
-                <h5 className="text-3sm text-center mb-2">OpenAI будет использовать эти данные для выбора подходящих для вас IT мероприятий.</h5>
-                <HackathonSearch />
+            <div className="mx-auto">
+                {/* <h5 className="text-3sm text-center mb-2">ИИ будет использовать эти данные для подбора подходящих для вас <span className='font-bold'>IT мероприятий</span></h5> */}
+                <EventSearch />
             </div>
         </div>
     );

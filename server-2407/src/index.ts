@@ -11,12 +11,34 @@ import { devitParser } from './scrapers/devitScraper'
 import { devpostParser } from './scrapers/devpostScraper'
 import cron from 'node-cron';
 import { kzItEventsTgParser } from './scrapers/kzEventsTgScraper'
+import cors from 'cors'
+import session from 'express-session';
+import { passport } from './routes/auth/auth-service'
 
 
 connectDB()
 
 const app = express()
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL, 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+  credentials: true 
+}));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET!,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production' // Set secure cookies in production
+  }
+}));
+
+//app.use(session({ secret: process.env.SESSION_SECRET!, resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.json())
 app.use(logger)
 app.use('/api/v5', globalRouter)

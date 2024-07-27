@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from '@/hooks/authContext';
+// import { AuthProvider } from '@/hooks/authContext';
+import { AuthProvider } from '../contexts/AuthContext'; 
 
 const poppins = Poppins({ 
   subsets: ["latin"],
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   title: "Tech Events",
   description: "Tech Events",
   icons: {
-    icon: '/assets/images/logo1.svg'
+    icon: '/assets/images/new-logo.svg'
   }
 };
 

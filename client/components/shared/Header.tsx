@@ -1,25 +1,27 @@
 'use client'
-import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '../ui/button';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '../../contexts/AuthContext';
 import NavItems from './NavItems';
 import MobileNav from './MobileNav';
-import {useAuth} from '../../hooks/authContext';
 
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
-
-
-
-const Header: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+const Header = () => {
+  const { isAuthenticated, user, logoutUser } = useAuth();
 
   return (
     <header className="w-full border-b">
       <div className="wrapper flex items-center justify-between">
         <Link href="/" className="w-48 flex items-center">
-          <Image src="/assets/images/logo1.svg" width={40} height={35} alt="Logo" />
+          <Image src="/assets/images/new-logo.svg" width={40} height={35} alt="Logo" className='h-auto'/>
           <h3 className="font-semibold text-xl ml-2">Tech Events</h3>
         </Link>
 
@@ -28,50 +30,68 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="flex w-32 justify-end gap-3">
-          <MobileNav />
-          {!isAuthenticated && (
+          {!isAuthenticated ? (
             <Button className="rounded-full hidden md:inline-grid" size="lg" asChild>
               <Link href="/sign-in">Login</Link>
             </Button>
+          ) : (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center gap-2 cursor-pointer md:hidden">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user?.profilePicture || '/assets/images/new-user.svg'} />
+                      <AvatarFallback>{user?.initials || '?'}</AvatarFallback>
+                      <span className="sr-only">Toggle user menu</span>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <Link href="/profile" className="flex items-center gap-2" prefetch={false}>
+                      <UserIcon className="h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem onClick={logoutUser} className="flex items-center gap-2">
+                    <LogOutIcon className="h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="md:flex items-center gap-2 cursor-pointer hidden">
+                    <span className="p-medium-16 whitespace-nowrap">My Profile</span>
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user?.profilePicture || '/assets/images/new-user.svg'} />
+                      <AvatarFallback>{user?.initials || '?'}</AvatarFallback>
+                      <span className="sr-only">Toggle user menu</span>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <Link href="/profile" className="flex items-center gap-2" prefetch={false}>
+                      <UserIcon className="h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem onClick={logoutUser} className="flex items-center gap-2">
+                    <LogOutIcon className="h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           )}
 
-          {isAuthenticated && (
-            <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className='flex items-center gap-2 cursor-pointer'>
-            <span className="p-medium-16 whitespace-nowrap">My Profile</span>
-              <Avatar className="h-9 w-9">
-                <AvatarImage src="/placeholder-user.jpg" />
-                <AvatarFallback>ZK</AvatarFallback>
-                <span className="sr-only">Toggle user menu</span>
-              </Avatar>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Link href="#" className="flex items-center gap-2" prefetch={false}>
-                  <UserIcon className="h-4 w-4" />
-                  <span>Profile</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href="#" className="flex items-center gap-2" prefetch={false}>
-                  <SettingsIcon className="h-4 w-4" />
-                  <span>Settings</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href="#" className="flex items-center gap-2" prefetch={false}>
-                  <LogOutIcon className="h-4 w-4" />
-                  <span>Logout</span>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          )}
-
+          <MobileNav />
         </div>
       </div>
     </header>
@@ -79,6 +99,89 @@ const Header: React.FC = () => {
 };
 
 export default Header;
+
+
+
+// import React from 'react';
+// import Image from 'next/image';
+// import Link from 'next/link';
+// import { Button } from '../ui/button';
+// import NavItems from './NavItems';
+// import MobileNav from './MobileNav';
+// import {useAuth} from '../../hooks/authContext';
+
+// import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
+// import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+
+
+
+// const Header: React.FC = () => {
+//   const { isAuthenticated } = useAuth();
+
+//   return (
+//     <header className="w-full border-b">
+//       <div className="wrapper flex items-center justify-between">
+//         <Link href="/" className="w-48 flex items-center">
+//           <Image src="/assets/images/logo1.svg" width={40} height={35} alt="Logo" />
+//           <h3 className="font-semibold text-xl ml-2">Tech Events</h3>
+//         </Link>
+
+//         <nav className="md:flex hidden w-full max-w-xs">
+//           <NavItems />
+//         </nav>
+
+//         <div className="flex w-32 justify-end gap-3">
+//           <MobileNav />
+//           {!isAuthenticated && (
+//             <Button className="rounded-full hidden md:inline-grid" size="lg" asChild>
+//               <Link href="/sign-in">Login</Link>
+//             </Button>
+//           )}
+
+//           {isAuthenticated && (
+//             <DropdownMenu>
+//             <DropdownMenuTrigger asChild>
+//               <div className='flex items-center gap-2 cursor-pointer'>
+//             <span className="p-medium-16 whitespace-nowrap">My Profile</span>
+//               <Avatar className="h-9 w-9">
+//                 <AvatarImage src="/placeholder-user.jpg" />
+//                 <AvatarFallback>ZK</AvatarFallback>
+//                 <span className="sr-only">Toggle user menu</span>
+//               </Avatar>
+//               </div>
+//             </DropdownMenuTrigger>
+//             <DropdownMenuContent align="end">
+//               <DropdownMenuItem>
+//                 <Link href="#" className="flex items-center gap-2" prefetch={false}>
+//                   <UserIcon className="h-4 w-4" />
+//                   <span>Profile</span>
+//                 </Link>
+//               </DropdownMenuItem>
+//               <DropdownMenuSeparator />
+//               <DropdownMenuItem>
+//                 <Link href="#" className="flex items-center gap-2" prefetch={false}>
+//                   <SettingsIcon className="h-4 w-4" />
+//                   <span>Settings</span>
+//                 </Link>
+//               </DropdownMenuItem>
+//               <DropdownMenuSeparator />
+//               <DropdownMenuItem>
+//                 <Link href="#" className="flex items-center gap-2" prefetch={false}>
+//                   <LogOutIcon className="h-4 w-4" />
+//                   <span>Logout</span>
+//                 </Link>
+//               </DropdownMenuItem>
+//             </DropdownMenuContent>
+//           </DropdownMenu>
+//           )}
+
+//         </div>
+//       </div>
+//     </header>
+//   );
+// };
+
+// export default Header;
 
 
 function LogOutIcon(props: React.SVGProps<SVGSVGElement>) {

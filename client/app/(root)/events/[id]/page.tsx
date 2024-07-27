@@ -7,27 +7,28 @@ import EventDetails from '@/components/shared/EventDetails';
 import { Button } from '@/components/ui/button';
 
 
-interface Hackathon {
+interface Event {
   title: string;
-  displayed_location: {
+  displayed_location?: {
     location: string;
   };
   url: string;
-  prize_amount: string;
-  rules: string;
-  time_left_to_submission: string;
-  submission_period_dates: string;
-  thumbnail_url: string;
-  themes: {
+  prize_amount?: string;
+  rules?: string;
+  time_left_to_submission?: string;
+  submission_period_dates?: string;
+  thumbnail_url?: string;
+  description?: string;
+  themes?: {
     id: number;
     name: string;
   }[];
   _id: string;
 }
 
-const fetchHackathon = async (id: string): Promise<Hackathon> => {
+const fetchEvent = async (id: string): Promise<Event> => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/v1/embeddings/hackathons/${id}`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching hackathon:', error);
@@ -39,7 +40,7 @@ const EventDetailsPage: FC<{ params: { id: string } }> = async ({ params }) => {
   const { id } = params;
 
   try {
-    const hackathon = await fetchHackathon(id);
+    const event = await fetchEvent(id);
 
     return (
       <div className="flex flex-col min-h-screen">
@@ -48,24 +49,24 @@ const EventDetailsPage: FC<{ params: { id: string } }> = async ({ params }) => {
           <div className="grid gap-6 md:grid-cols-[1fr_400px] md:gap-12">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter text-primary-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-              {hackathon.title}
+              {event.title}
               </h1>
               <div className="flex flex-col gap-2 text-primary-foreground">
                 <div className="flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5" />
-                <span>Submission Period: {hackathon.submission_period_dates}</span>
+                <span>Submission Period: {event.submission_period_dates}</span>
                 </div>
                 <div className="flex items-center gap-2">
                 <ClockIcon className="w-5 h-5" />
-                <span>Time Left to Submit: {hackathon.time_left_to_submission}</span>
+                <span>Time Left to Submit: {event.time_left_to_submission}</span>
                 </div>
                 <div className="flex items-center gap-2">
                 <AwardIcon className="w-5 h-5" />
-                <span>Total Prize: {hackathon.prize_amount}</span>
+                <span>Total Prize: {event.prize_amount}</span>
                 </div>
                 <div className="flex items-center gap-2">
                 <LocateIcon className="w-5 h-5" />
-                <span>{hackathon.displayed_location.location}</span>
+                <span>{event.displayed_location ? event.displayed_location.location : 'не указано'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-medium">
               <FlagIcon className="w-5 h-5" />
@@ -98,22 +99,22 @@ const EventDetailsPage: FC<{ params: { id: string } }> = async ({ params }) => {
               </p>
             </div>
             <div className="flex flex-col items-start gap-4">
-              <img src={hackathon.thumbnail_url} width="400" height="300" alt="Event" className="rounded-lg object-cover" />
+              <img src={event.thumbnail_url} width="400" height="300" alt="Event" className="rounded-lg object-cover" />
             </div>
           </div>
         </div>
         <div className="container px-4 md:px-6">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {hackathon.themes.map(theme => (
+          {/* {hackathon.themes.map(theme => (
                 <div key={theme.id} className="grid gap-2">
                 <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">{theme.name}</div>
               </div>
-            ))}
+            ))} */}
             
           </div>
         </div>
         </section>
-        <EventDetails hackathon={hackathon} />
+        <EventDetails event={event} />
       </div>
     );
   } catch (error) {

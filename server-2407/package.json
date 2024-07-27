@@ -17,6 +17,7 @@
 		"axios": "^1.7.2",
 		"bcryptjs": "^2.4.3",
 		"cheerio": "^1.0.0-rc.12",
+		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"express": "^4.19.2",
 		"express-session": "^1.18.0",
@@ -27,6 +28,7 @@
 		"node-cron": "^3.0.3",
 		"openai": "^4.53.0",
 		"passport": "^0.7.0",
+		"passport-google-oauth20": "^2.0.0",
 		"puppeteer": "^22.13.1",
 		"session": "^0.1.0"
 	},

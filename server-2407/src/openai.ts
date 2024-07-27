@@ -232,8 +232,17 @@ const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | 
             }
             User will write their preferences in text format. You should consider this and recommend the tech events based on the user's preferences.
             Do not invent non-existent events that are not on the list, take only those suitable events from my list.
-            Add the reason field there and specify the reason for choosing this event based on the user's request and also document.
-            Return at least 5 of the most suitable events in the following JSON format:
+            Add the reason field there and specify the reason for choosing this event based on the user's request and also document. Add this fields 
+            "_id": укажи _id,
+            "title": укажи title,
+            "url": укажи url,
+            "description": возьми это поле с самой базы данных,
+            "reason": пропиши аргументируя почему я должна заинтересоваться именно этим мероприятеим,
+            "date": найди по контексту дату чтобы вскоре я могла данное мероприятие добавить в гугл календарь, если не найдешь то укажи 'не указан',
+           "thumbnail_url": укажи thumbnail_url если есть, а если нет null,
+           "location": укажи место где будет проходить это мероприятие или же он онлайн, если не найдешь то укажи 'не указан',
+
+            Return at least 5 of the most suitable events (it can be conference, hackathon, meetup or any type of events) based on user's preference in the following JSON format:
           `
         },
         {

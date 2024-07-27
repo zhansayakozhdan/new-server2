@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class="">
+  <g>
+    <linearGradient id="a" x1="256" x2="256" y1="512" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-opacity="1" stop-color="#a93aff" offset="0"/>
+      <stop stop-opacity="1" stop-color="#9351cd" offset="1"/>
+    </linearGradient>
+    <path d="M497 256c0 132.548-108.452 241-241 241S15 388.548 15 256 123.452 15 256 15s241 108.452 241 241zm-211 0h-60c-49.706 0-90 40.294-90 90 0 16.569 13.431 30 30 30h180c16.569 0 30-13.431 30-30 0-49.706-40.294-90-90-90zm-30-150c-33.137 0-60 26.863-60 60s26.863 60 60 60 60-26.863 60-60-26.863-60-60-60z" style="fill:none;stroke:url(#a);stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
+  </g>
+</svg>

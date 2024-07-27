@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useHackathons } from "@/hooks/useHackathons";
+import { useEvents } from "@/hooks/useEvents";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import MyCard from "@/components/shared/card";
@@ -11,7 +11,7 @@ import MyCard from "@/components/shared/card";
 
 export default function Home() {
     const [page, setPage] = useState(1);
-    const { hackathons, loading } = useHackathons(page, 9); 
+    const { events, loading } = useEvents(page, 9); 
 
     const nextPage = () => {
         setPage(page + 1);
@@ -29,8 +29,8 @@ export default function Home() {
             <section className="bg-primary-50 bg-dotted-pattern bg-contain py-5 md:py-10">
                 <div className="wrapper grid grid-cols-1 gap-5 md:grid-cols-2 2xl:gap-0">
                     <div className="flex flex-col justify-center gap-8">
-                        <h1 className="text-5xl font-bold">
-                            Узнайте о предстоящих IT мероприятиях по всему миру, подходящих именно вам в один клик.
+                        <h1 className="md:h2-bold text-center h3-bold md:text-start">
+                            Узнайте о предстоящих IT мероприятиях по всему миру, подходящих именно вам в один клик!
                         </h1>
                         {/* 
                         <p>Узнайте о предстоящих хакатонах, ИТ-конференциях и технических мероприятиях по всему миру, подходящих именно вам.</p>
@@ -45,11 +45,11 @@ export default function Home() {
                     </div>
 
                     <Image
-                        src="/assets/images/hero.png"
+                        src="/assets/images/landing.jpg"
                         alt="hero"
                         width={1000}
                         height={1000}
-                        className="max-h-[70vh] object-contain object-center 2xl:max-h-[80vh]"
+                        className="max-h-[70vh] object-contain object-center 2xl:max-h-[80vh] rounded-xl"
                     />
                 </div>
             </section>
@@ -61,7 +61,7 @@ export default function Home() {
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Предстоящие мероприятия</div>
                 <h2 className="text-3xl font-bold sm:text-5xl text-primary-500">Не упусти свои возможности</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed p-medium">
                 Наш сайт предназначен не только для разработчиков, но и для всех, кто работает в IT сфере!
                 </p>
                 {/* <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -70,21 +70,29 @@ export default function Home() {
               </div>
             </div>
                 {loading ? (
-                    <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full border-4 border-primary border-t-transparent h-8 w-8" />
-                  </div>
+                  //   <div className="flex items-center justify-center">
+                  //   <div className="animate-spin rounded-full border-4 border-primary border-t-transparent h-8 w-8" />
+                  // </div>
+                  <div className="flex items-center justify-center h-full">
+      <div className="relative w-20 h-20 animate-spin">
+        <div className="absolute bg-primary rounded-full" />
+        <div className="absolute bg-background rounded-full flex items-center justify-center">
+          <RocketIcon className="w-8 h-8 text-primary" />
+        </div>
+      </div>
+    </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {hackathons.map((hackathon) => (
+                        {Array.isArray(events) && events.map((hackathon) => (
                                 <MyCard
                                     key={hackathon.title}
                                     _id = {hackathon._id}
                                     title={hackathon.title}
-                                    location={hackathon.displayed_location.location}
-                                    thumbnail={hackathon.thumbnail_url}
+                                    location={hackathon.displayed_location ? hackathon.displayed_location.location : ''}
+                                    thumbnail={hackathon.thumbnail_url || '/assets/images/default-image.jpg'}
                                     url={hackathon.url}
-                                    prize={hackathon.prize_amount}
+                                    prize={hackathon.prize_amount || ''} 
                                 />
                             ))}
                         </div>
@@ -100,6 +108,7 @@ export default function Home() {
                             <button
                                 className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
                                 onClick={nextPage}
+                                disabled={page === 12}
                             >
                                 Next
                             </button>
@@ -181,77 +190,30 @@ export default function Home() {
           </div>
         </section> */}
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Past Events</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Highlights from Previous Events</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Check out some of the key moments and insights from our past IT events. Get a glimpse of the engaging
-                  discussions, innovative presentations, and valuable networking opportunities.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-              <Card className="group">
-                <CardHeader>
-                  <img
-                    src="/placeholder.svg"
-                    width="550"
-                    height="310"
-                    alt="Event Highlight"
-                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
-                  />
-                </CardHeader>
-                <CardContent>
-                  <h4 className="text-lg font-semibold">Cloud Computing Summit 2022</h4>
-                  <p className="text-muted-foreground">
-                    Experts discussed the latest advancements in cloud technology and infrastructure, sharing insights
-                    on optimizing cloud deployments.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="group">
-                <CardHeader>
-                  <img
-                    src="/placeholder.svg"
-                    width="550"
-                    height="310"
-                    alt="Event Highlight"
-                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
-                  />
-                </CardHeader>
-                <CardContent>
-                  <h4 className="text-lg font-semibold">Cybersecurity Symposium 2021</h4>
-                  <p className="text-muted-foreground">
-                    Industry leaders discussed the latest cybersecurity threats and shared best practices for
-                    strengthening enterprise security.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="group">
-                <CardHeader>
-                  <img
-                    src="/placeholder.svg"
-                    width="550"
-                    height="310"
-                    alt="Event Highlight"
-                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
-                  />
-                </CardHeader>
-                <CardContent>
-                  <h4 className="text-lg font-semibold">DevOps Masterclass 2020</h4>
-                  <p className="text-muted-foreground">
-                    Experts shared their insights on optimizing DevOps workflows, improving team collaboration, and
-                    accelerating software delivery.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+       
       
         </>
     );
+}
+
+function RocketIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+    </svg>
+  )
 }

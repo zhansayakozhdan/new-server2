@@ -10,33 +10,34 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import {v4 as uuidv4} from 'uuid';
 
-interface Hackathon {
+interface Event {
   title: string;
-  displayed_location: {
+  displayed_location?: {
     location: string;
   };
   url: string;
-  prize_amount: string;
-  rules: string;
-  time_left_to_submission: string;
-  submission_period_dates: string;
-  thumbnail_url: string;
-  themes: {
+  prize_amount?: string;
+  rules?: string;
+  time_left_to_submission?: string;
+  submission_period_dates?: string;
+  thumbnail_url?: string;
+  description?: string;
+  themes?: {
     id: number;
     name: string;
   }[];
   _id: string;
 }
 
-const EventDetails = ({ hackathon }: { hackathon: Hackathon }) => {
+const EventDetails = ({ event }: { event: Event }) => {
   const [todoList, setTodoList] = useState<{ id: string; text: string; completed: boolean }[]>([]);
   const [newTask, setNewTask] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fetchTodoList = async (hackathonId: string) => {
+  const fetchTodoList = async (eventId: string) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/embeddings/query-todo', { hackathonId });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/query-todo`, { eventId });
       const todoString = response.data.todoList;
       const todoArray = todoString
         .split('\n')
@@ -92,17 +93,17 @@ const EventDetails = ({ hackathon }: { hackathon: Hackathon }) => {
                 <div className="flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5" />
                   <span className="font-medium">Submission Period:</span>
-                  <span>{hackathon.submission_period_dates}</span>
+                  <span>{event.submission_period_dates}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ClockIcon className="w-5 h-5" />
                   <span className="font-medium">Time Left to Submit:</span>
-                  <span>{hackathon.time_left_to_submission}</span>
+                  <span>{event.time_left_to_submission}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <AwardIcon className="w-5 h-5" />
                   <span className="font-medium">Total Prize:</span>
-                  <span>{hackathon.prize_amount}</span>
+                  <span>{event.prize_amount}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FlagIcon className="w-5 h-5" />
@@ -120,14 +121,14 @@ const EventDetails = ({ hackathon }: { hackathon: Hackathon }) => {
               </p>
               <div className="flex gap-2">
               <button
-                  onClick={() => fetchTodoList(hackathon._id)}
+                  onClick={() => fetchTodoList(event._id)}
 
                   className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   Generate To-Do List
                 </button>
                 <Link
-                  href={hackathon.url}
+                  href={event.url}
                   className="inline-flex h-10 items-center justify-center rounded-md bg-secondary px-6 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90 border"
                 >
                   Visit Website

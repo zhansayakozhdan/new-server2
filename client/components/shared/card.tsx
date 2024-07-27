@@ -7,7 +7,7 @@ interface CardProps {
   location: string;
   thumbnail: string;
   url: string;
-  prize: string;
+  prize?: string;
 }
 
 const MyCard: React.FC<CardProps> = ({ _id, title, location, thumbnail, url, prize }) => {
@@ -31,9 +31,9 @@ const MyCard: React.FC<CardProps> = ({ _id, title, location, thumbnail, url, pri
       <div className="p-4">
         <h3 className="text-lg font-bold">{title}</h3>
         <p className="text-sm text-gray-500">{location}</p>
-        <p className="text-sm text-gray-700">Prize: ${extractCurrencyValue(prize)}</p>
+        {/* <p className="text-sm text-gray-700">Prize: ${extractCurrencyValue(prize)}</p> */}
         <Link href={`events/${_id}`} passHref legacyBehavior>
-          <a className="text-primary-500 hover:text-primary-700">Learn more</a>
+          <a className="text-primary-500 hover:text-primary-700">Подробнее</a>
         </Link>
       </div>
     </div>
