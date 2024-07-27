@@ -115,7 +115,7 @@ const EventDetails = ({ event }: { event: Event }) => {
             <div className="grid gap-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Get Involved</h2>
               <p className="text-muted-foreground">
-                If you're interested in participating in SummerHacks By YCW, visit the event website to learn more and
+                If you&apos;re interested in participating in SummerHacks By YCW, visit the event website to learn more and
                 submit your project. You can also follow us on social media to stay up-to-date with the latest news
                 and updates.
               </p>

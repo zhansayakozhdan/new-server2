@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FC } from 'react';
 import EventDetails from '@/components/shared/EventDetails';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 
 interface Event {
@@ -93,14 +94,14 @@ const EventDetailsPage: FC<{ params: { id: string } }> = async ({ params }) => {
               </p>
               <p className="mt-4 text-muted-foreground">
                 Attendees will have the chance to learn from industry experts, connect with like-minded individuals, and
-                explore new technologies that are shaping the future. Whether you're a seasoned tech veteran or just
+                explore new technologies that are shaping the future. Whether you&apos;re a seasoned tech veteran or just
                 starting your journey, this conference is the perfect place to expand your knowledge, build valuable
                 connections, and be inspired by the transformative power of technology.
               </p>
             </div>
-            <div className="flex flex-col items-start gap-4">
-              <img src={event.thumbnail_url} width="400" height="300" alt="Event" className="rounded-lg object-cover" />
-            </div>
+            {/* <div className="flex flex-col items-start gap-4">
+              <Image src="${event.thumbnail_url}" width={400} height={300} alt="Event" className="rounded-lg object-cover" />
+            </div> */}
           </div>
         </div>
         <div className="container px-4 md:px-6">
