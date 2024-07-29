@@ -1,14 +1,14 @@
 export const headerLinks = [
     {
-      label: 'Home',
+      label: 'Главная',
       route: '/',
     },
     {
-      label: 'Event Finder',
+      label: 'Умный поиск',
       route: '/search',
     },
     {
-      label: 'About',
+      label: 'О нас',
       route: '#/about',
     },
   ]

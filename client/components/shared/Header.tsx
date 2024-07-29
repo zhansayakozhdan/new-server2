@@ -32,7 +32,7 @@ const Header = () => {
         <div className="flex w-32 justify-end gap-3">
           {!isAuthenticated ? (
             <Button className="rounded-full hidden md:inline-grid" size="lg" asChild>
-              <Link href="/sign-in">Login</Link>
+              <Link href="/sign-in">Войти</Link>
             </Button>
           ) : (
             <>
@@ -50,14 +50,14 @@ const Header = () => {
                   <DropdownMenuItem>
                     <Link href="/profile" className="flex items-center gap-2" prefetch={false}>
                       <UserIcon className="h-4 w-4" />
-                      <span>Profile</span>
+                      <span>Ваш профиль</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem onClick={logoutUser} className="flex items-center gap-2">
                     <LogOutIcon className="h-4 w-4" />
-                    <span>Logout</span>
+                    <span>Выйти</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -65,7 +65,7 @@ const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="md:flex items-center gap-2 cursor-pointer hidden">
-                    <span className="p-medium-16 whitespace-nowrap">My Profile</span>
+                    <span className="p-medium-16 whitespace-nowrap">Мой профиль</span>
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={user?.profilePicture || '/assets/images/new-user.svg'} />
                       <AvatarFallback>{user?.initials || '?'}</AvatarFallback>
@@ -77,14 +77,14 @@ const Header = () => {
                   <DropdownMenuItem>
                     <Link href="/profile" className="flex items-center gap-2" prefetch={false}>
                       <UserIcon className="h-4 w-4" />
-                      <span>Profile</span>
+                      <span>Ваш профиль</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem onClick={logoutUser} className="flex items-center gap-2">
                     <LogOutIcon className="h-4 w-4" />
-                    <span>Logout</span>
+                    <span>Выйти</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
