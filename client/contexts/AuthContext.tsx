@@ -33,10 +33,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const accessToken = urlParams.get('accessToken');
     const refreshToken = urlParams.get('refreshToken');
 
+    // if (accessToken && refreshToken) {
+    //   localStorage.setItem('accessToken', accessToken);
+    //   localStorage.setItem('refreshToken', refreshToken);
+    //   return true;
+    // }
+
     if (accessToken && refreshToken) {
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      return true;
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          setIsAuthenticated(true);
+          setUser(user); // Ideally, set the user data from tokens
+          
+          // Clean the URL after processing
+          urlParams.delete('accessToken');
+          urlParams.delete('refreshToken');
+          urlParams.delete('loginSource');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return true;
     }
 
     return false;
@@ -221,6 +235,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const savedUser = localStorage.getItem('user');
       const savedAccessToken = localStorage.getItem('accessToken');
       const savedRefreshToken = localStorage.getItem('refreshToken');
+      
   
       if (savedUser && savedAccessToken && savedRefreshToken) {
         setUser(JSON.parse(savedUser));

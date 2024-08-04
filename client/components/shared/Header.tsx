@@ -40,7 +40,7 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <div className="flex items-center gap-2 cursor-pointer md:hidden">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.profilePicture || '/assets/images/new-user.svg'} />
+                      <AvatarImage src={user?.picture || '/assets/images/new-user.svg'} />
                       <AvatarFallback>{user?.initials || '?'}</AvatarFallback>
                       <span className="sr-only">Toggle user menu</span>
                     </Avatar>
@@ -67,7 +67,7 @@ const Header = () => {
                   <div className="md:flex items-center gap-2 cursor-pointer hidden">
                     <span className="p-medium-16 whitespace-nowrap">Мой профиль</span>
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.profilePicture || '/assets/images/new-user.svg'} />
+                      <AvatarImage src={user?.picture || '/assets/images/new-user.svg'} />
                       <AvatarFallback>{user?.initials || '?'}</AvatarFallback>
                       <span className="sr-only">Toggle user menu</span>
                     </Avatar>

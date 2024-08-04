@@ -59,45 +59,63 @@ const Login = () => {
 
 
     return (
-        <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
-            <div className="mx-auto w-full max-w-md space-y-6">
-                <div className="space-y-2 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Войти</h1>
-                    <p className="text-muted-foreground">Введите ваш адрес электронной почты и пароль.</p>
-                </div>
-                <form onSubmit={handleLogin}>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="madina@example.com" required 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}/>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="password">Пароль</Label>
-                        <Input id="password" type="password" required 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}/>
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? 'Вход...' : 'Войти'}
-                        </Button>
-                    <Button variant="outline" className="w-full" onClick={loginWithGoogle} disabled={loading} type="button">
-                        <ChromeIcon className="mr-2 h-4 w-4" />
-                        {loading ? 'Вход...' : 'Войти через Google'}
-                    </Button>
-                </div>
-                </form>
-                <div className="text-center">
-                    <p className="text-muted-foreground text-sm">
-                    Ещё нет аккаунта?{" "}
-                        <Link href="/sign-up" className="font-medium underline text-sm" prefetch={false}>
-                        Зарегестрироваться
-                        </Link>
-                    </p>
-                </div>
-            </div>
+        <div className="flex min-h-[80dvh] items-center justify-center bg-background px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8">
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <ChromeIcon className="h-12 w-12" />
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">Войти через Google</h2>
+          <p className="text-muted-foreground text-center">
+          Для добавления мероприятий в Google Календарь, нужно предоставить доступ к вашему календарю. 
+          </p>
         </div>
+        <Button variant="outline" className="w-full flex items-center justify-center gap-2"
+         onClick={loginWithGoogle} disabled={loading} type="button">
+                        <ChromeIcon className="h-5 w-5" />
+                        {loading ? 'Вход...' : 'Войти через Google'}
+        </Button>
+      </div>
+    </div>
+
+
+        // <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+        //     <div className="mx-auto w-full max-w-md space-y-6">
+        //         <div className="space-y-2 text-center">
+        //             <h1 className="text-3xl font-bold tracking-tight text-foreground">Войти</h1>
+        //             <p className="text-muted-foreground">Введите ваш адрес электронной почты и пароль.</p>
+        //         </div>
+        //         <form onSubmit={handleLogin}>
+        //         <div className="space-y-4">
+        //             <div className="space-y-2">
+        //                 <Label htmlFor="email">Email</Label>
+        //                 <Input id="email" type="email" placeholder="madina@example.com" required 
+        //                 value={email}
+        //                 onChange={(e) => setEmail(e.target.value)}/>
+        //             </div>
+        //             <div className="space-y-2">
+        //                 <Label htmlFor="password">Пароль</Label>
+        //                 <Input id="password" type="password" required 
+        //                 value={password}
+        //                 onChange={(e) => setPassword(e.target.value)}/>
+        //             </div>
+        //             <Button type="submit" className="w-full" disabled={loading}>
+        //                     {loading ? 'Вход...' : 'Войти'}
+        //                 </Button>
+        //             <Button variant="outline" className="w-full" onClick={loginWithGoogle} disabled={loading} type="button">
+        //                 <ChromeIcon className="mr-2 h-4 w-4" />
+        //                 {loading ? 'Вход...' : 'Войти через Google'}
+        //             </Button>
+        //         </div>
+        //         </form>
+        //         <div className="text-center">
+        //             <p className="text-muted-foreground text-sm">
+        //             Ещё нет аккаунта?{" "}
+        //                 <Link href="/sign-up" className="font-medium underline text-sm" prefetch={false}>
+        //                 Зарегестрироваться
+        //                 </Link>
+        //             </p>
+        //         </div>
+        //     </div>
+        // </div>
     );
 };
 
