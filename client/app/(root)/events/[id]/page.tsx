@@ -236,9 +236,18 @@ const EventDetailsPage: FC<{ params: { id: string } }> = ({ params }) => {
     localStorage.setItem(localStorageKey, JSON.stringify(updatedTodoList));
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (eventLoading) {
+    return (
+    <div className="flex items-center justify-center h-full">
+      <div className="relative w-20 h-20 animate-spin">
+      <div className="absolute bg-primary rounded-full" />
+      <div className="absolute bg-background rounded-full flex items-center justify-center">
+      <RocketIcon className="w-8 h-8 text-primary" />
+      </div>
+      </div>
+    </div>
+      )
+    }
 
   if (error) {
     return <div>{error}</div>;
@@ -305,18 +314,19 @@ const EventDetailsPage: FC<{ params: { id: string } }> = ({ params }) => {
       {/* {event && <EventDetails event={event}/>} */}
 
       {loading ? (
-        <section className="py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
-            </div>
-          </div>
-        </section>
+        <div className="flex items-center justify-center h-full">
+        <div className="relative w-20 h-20 animate-spin">
+        <div className="absolute bg-primary rounded-full" />
+        <div className="absolute bg-background rounded-full flex items-center justify-center">
+        <RocketIcon className="w-8 h-8 text-primary" />
+        </div>
+        </div>
+        </div>
       ) : (
         <section className="py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="grid gap-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">To-Do List</h2>
+              <h2 className="text-3xl font-bold sm:text-4xl">План подготовки</h2>
               <div className="flex items-center mb-4">
                 <Input
                   type="text"
@@ -493,6 +503,28 @@ function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
     >
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
       <circle cx="12" cy="10" r="3" />
+    </svg>
+  )
+}
+
+function RocketIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
     </svg>
   )
 }
