@@ -21,7 +21,7 @@ export const googleCallback = async (req: Request, res: Response) => {
         const refreshToken = tokens.refresh_token;
   
         // Redirect to frontend with tokens (avoid exposing tokens in URL in production)
-        res.redirect(`${process.env.FRONTEND_URL}/?accessToken=${accessToken}&refreshToken=${refreshToken}`);
+        res.redirect(`https://techeventsai.vercel.app/?accessToken=${accessToken}&refreshToken=${refreshToken}`);
       } else {
         res.status(401).json({ message: 'Unable to fetch user profile' });
       }
@@ -52,7 +52,7 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
     console.log('Google Calendar Events:', events);
 
     //res.send('Успешная авторизация');
-    res.redirect(`${process.env.FRONTEND_URL}`)
+    res.redirect(`https://techeventsai.vercel.app`)
   } catch (error) {
     console.error('Ошибка при авторизации:', error);
     res.status(500).send('Ошибка при авторизации');
