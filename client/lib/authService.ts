@@ -6,21 +6,27 @@ export const getAuthState = async () => {
   };
   
   export const login = async (email: string, password: string) => {
-    // Make an API call to login
-    const response = await fetch('/api/v5/auth/login', {
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+          'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ email, password }),
-    });
-  
-    if (response.ok) {
+      credentials: 'include' // Ensure cookies are included in the request
+  });
+  if (response.ok) {
+      // Handle successful login
+      console.log('User logged in successfully!');
       const { accessToken, refreshToken, user } = await response.json();
-      localStorage.setItem('authToken', accessToken);
+      localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
-      return { user };
-    }
-  
-    throw new Error('Login failed');
+      return { user, accessToken, refreshToken };
+  } else {
+      console.error('Login failed:', await response.text());
+  }
+
+  throw new Error('Login failed');
   };
   
   export const logout = async () => {
@@ -28,4 +34,26 @@ export const getAuthState = async () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
   };
+
+  // export const loginWithGoogle = async () => {
+
+  //   const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`, {
+  //     method: 'GET',
+  //     headers: {
+  //         'Content-Type': 'application/json',
+  //     },
+  //     credentials: 'include' // Ensure cookies are included in the request
+  // });
+  // if (response.ok) {
+  //     // Handle successful login
+  //     console.log('User logged in successfully!');
+  //     const { accessToken, user } = await response.json();
+  //     localStorage.setItem('accessToken', accessToken);
+  //     return { user, accessToken};
+  // } else {
+  //     console.error('Login failed:', await response.text());
+  // }
+
+  // throw new Error('Login failed');
+  // };
   

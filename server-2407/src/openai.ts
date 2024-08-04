@@ -47,7 +47,7 @@ async function hitOpenAiApiTest(prompt: string): Promise<string | undefined> {
                                   [
                                       {
                                           _id: new ObjectId('6699664927fb8fa5acb374aa'),
-                                          title: 'Название хакатона',
+                                          title: 'Название мероприятия',
                                           displayed_location: { icon: 'globe', location: 'Online' },
                                           open_state: 'upcoming',
                                           thumbnail_url: '//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/002/951/096/datas/medium_square.png',
@@ -218,7 +218,7 @@ const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | 
                 "thumbnail_url": "//d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/002/951/096/datas/medium_square.png",
                 "url": "https://innovatex-hackathon.devpost.com/",
                 "time_left_to_submission": "Upcoming",
-                "submission_period_dates": "Jul 25 - 29, 2024",
+                "submission_period_dates": "25.09.2024 - 29.09.2024",
                 "prize_amount": "$6,000",
                 "registrations_count": 16,
                 "organization_name": "InnovativeX",
@@ -238,11 +238,11 @@ const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | 
             "url": укажи url,
             "description": возьми это поле с самой базы данных,
             "reason": пропиши аргументируя почему я должна заинтересоваться именно этим мероприятеим,
-            "date": найди по контексту дату чтобы вскоре я могла данное мероприятие добавить в гугл календарь, если не найдешь то укажи 'не указан',
+            "date": укажи дату в формате DD.MM.YYYY, возьми это поле с самой базы данных submission_period_dates, чтобы вскоре я могла данное мероприятие добавить в гугл календарь, если не найдешь то укажи 'не указан',
            "thumbnail_url": укажи thumbnail_url если есть, а если нет null,
            "location": укажи место где будет проходить это мероприятие или же он онлайн, если не найдешь то укажи 'не указан',
 
-            Return at least 5 of the most suitable events (it can be conference, hackathon, meetup or any type of events) based on user's preference in the following JSON format:
+            Return at least 6 of the most suitable events (it can be conference, hackathon, meetup or any type of events) based on user's preference in the following JSON format:
           `
         },
         {
@@ -272,4 +272,30 @@ const hitOpenAiApiNew = async (prompt: string, events: any[]): Promise<string | 
 
 
 
-export { hitOpenAiApi, hitOpenAiApiTest, hitOpenAiApiNew };
+
+async function hitOpenAiApiTwo(prompt: string): Promise<string | undefined> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      temperature: 0.5,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    });
+
+    const content: string | undefined = response.choices[0]?.message?.content ?? undefined;
+    return content;
+  } catch (error) {
+    console.error('Error hitting OpenAI API:', error);
+    return undefined;
+  }
+}
+
+export { hitOpenAiApi, hitOpenAiApiTest, hitOpenAiApiNew, hitOpenAiApiTwo };

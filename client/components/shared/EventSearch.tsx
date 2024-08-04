@@ -411,7 +411,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Link from 'next/link';
 import { Badge } from "@/components/ui/badge"
 import { Label } from '@radix-ui/react-label';
-
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Theme {
   _id: string;
@@ -469,6 +469,8 @@ const HackathonSearch: React.FC = () => {
   const [result, setResult] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { user } = useAuth();
+
 
   const exampleQueries = [
     "Возраст: 23; Я из города Алматы; Web developer;",
@@ -516,79 +518,331 @@ const HackathonSearch: React.FC = () => {
     localStorage.removeItem('result');
   };
 
-  const handleAddToCalendar = async (hackathon: Event) => {
+  // const addEventToCalendar1 = async (event: TopEvent) => {
+  //   if (!user) {
+  //     alert('You need to be logged in to add events to the calendar.');
+  //     return;
+  //   }
+  
+  //   try {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         userId: user._id,
+  //         title: event.title,
+  //         submission_period_dates: event.submission_period_dates,
+  //         description: event.title,
+  //         location: event.displayed_location?.location,
+  //       }),
+  //     });
+  
+  //     // Check if the response is in JSON format
+  //     const contentType = response.headers.get('Content-Type');
+  //     if (contentType && contentType.includes('application/json')) {
+  //       const data = await response.json();
+        
+  //       if (!response.ok) {
+  //         throw new Error(data.error || 'Failed to add event to calendar');
+  //       }
+  
+  //       alert(`Event successfully added with ID: ${data.eventId}`);
+  //     } else {
+  //       // Handle non-JSON responses
+  //       const text = await response.text();
+  //       console.error('Unexpected response:', text);
+  //       throw new Error('Received non-JSON response from server');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error adding event:', error);
+  //     alert(`Failed to add event to calendar: ${error}`);
+  //   }
+  // };
+
+  const addEventToCalendar1 = async (event: TopEvent) => {
+    const accessToken = localStorage.getItem('accessToken');
+  
+    if (!accessToken) {
+      alert('You need to be logged in to add events to the calendar.');
+      return;
+    }
+  
     try {
-      const [startDate, endDateWithYear] = hackathon.date.split(' - ').map(date => date.trim());
-      const [endDate, endYear] = endDateWithYear.split(', ').map(date => date.trim());
-
-      const startDateTime = new Date(`${startDate}, ${endYear}`);
-      const endMonth = startDate.split(' ')[0]; // Extract the month from the startDate
-      const endDateTime = new Date(`${endMonth} ${endDate}, ${endYear}`);
-
-      if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-        throw new Error('Invalid date format');
-      }
-
-      const event = {
-        summary: hackathon.title,
-        description: hackathon.title,
-        start: {
-          dateTime: startDateTime.toISOString(),
-          timeZone: 'Asia/Almaty',
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        end: {
-          dateTime: endDateTime.toISOString(),
-          timeZone: 'Asia/Almaty',
-        },
-      };
-
-      await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/google-auth/add-to-calendar`, { event }, {
-        withCredentials: true,
+        body: JSON.stringify({
+          accessToken,
+          event,
+        }),
       });
-
-      alert('Event added to Google Calendar');
+  
+      const contentType = response.headers.get('Content-Type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to add event to calendar');
+        }
+  
+        alert(`Event successfully added with ID: ${data.id}`);
+      } else {
+        const text = await response.text();
+        console.error('Unexpected response:', text);
+        throw new Error('Received non-JSON response from server');
+      }
     } catch (error) {
-      console.error('Error adding to Google Calendar:', error);
-      alert('Failed to add event to Google Calendar');
+      console.error('Error adding event:', error);
+      alert(`Failed to add event to calendar: ${error}`);
+    }
+  };
+  
+  
+
+  const addEventToCalendar = async (event: Event) => {
+    const accessToken = localStorage.getItem('accessToken');
+  
+    if (!accessToken) {
+      alert('You need to be logged in to add events to the calendar.');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          accessToken,
+          event: {
+          title: event.title,
+          submission_period_dates: event.date, // Ensure this format is compatible with your backend
+          description: event.description,
+          location: event.location,
+          },
+        }),
+      });
+  
+      const contentType = response.headers.get('Content-Type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to add event to calendar');
+        }
+  
+        alert(`Event successfully added with ID: ${data.id}`);
+      } else {
+        const text = await response.text();
+        console.error('Unexpected response:', text);
+        throw new Error('Received non-JSON response from server');
+      }
+    } catch (error) {
+      console.error('Error adding event:', error);
+      alert(`Failed to add event to calendar: ${error}`);
     }
   };
 
-  const handleAddEventToCalendar = async (topEvent: TopEvent) => {
-    try {
-      const [startDate, endDateWithYear] = topEvent.submission_period_dates.split(' - ').map(date => date.trim());
-      const [endDate, endYear] = endDateWithYear.split(', ').map(date => date.trim());
 
-      const startDateTime = new Date(`${startDate}, ${endYear}`);
-      const endMonth = startDate.split(' ')[0]; // Extract the month from the startDate
-      const endDateTime = new Date(`${endMonth} ${endDate}, ${endYear}`);
+  // const addEventToCalendar = async (event: Event) => {
+  //   try {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         userId: user._id, // Replace with the actual user ID
+  //         title: event.title,
+  //         date: event.date, // Ensure this format is compatible with your backend
+  //         description: event.description,
+  //         location: event.location,
+  //       }),
+  //     });
 
-      if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-        throw new Error('Invalid date format');
-      }
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error || 'Failed to add event to calendar');
+  //     }
 
-      const event = {
-        summary: topEvent.title,
-        description: topEvent.title,
-        start: {
-          dateTime: startDateTime.toISOString(),
-          timeZone: 'Asia/Almaty',
-        },
-        end: {
-          dateTime: endDateTime.toISOString(),
-          timeZone: 'Asia/Almaty',
-        },
-      };
+  //     const data = await response.json();
+  //     alert(`Event added successfully with ID: ${data.eventId}`);
+  //   } catch (error) {
+  //     console.error('Error adding event:', error);
+  //     alert(`Failed to add event to calendar: ${error}`);
+  //   } 
+  // };
 
-      await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/google-auth/add-to-calendar`, { event }, {
-        withCredentials: true,
-      });
 
-      alert('Event added to Google Calendar');
-    } catch (error) {
-      console.error('Error adding to Google Calendar:', error);
-      alert('Failed to add event to Google Calendar');
-    }
-  };
+//   const addEventToCalendar1 = async (event: TopEvent) => {
+//     console.log(event.submission_period_dates);
+//     console.log(user._id);
+//     try {
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           userId: user._id, // Замените на реальный userId
+//           title: event.title,
+//           date: event.submission_period_dates, // Убедитесь, что формат даты совместим с вашим бекендом
+//           description: event.title,
+//           location: event.displayed_location?.location,
+//         }),
+//       });
+  
+//       if (!response.ok) {
+//         const errorData = await response.json();
+//         throw new Error(errorData.error || 'Не удалось добавить событие в календарь');
+//       }
+  
+//       const data = await response.json();
+//       alert(`Событие успешно добавлено с ID: ${data.eventId}`);
+//     } catch (error) {
+//       console.error('Ошибка при добавлении события:', error);
+//       alert(`Не удалось добавить событие в календарь: ${error}`);
+//     }
+// };
+
+
+
+  // const addEventToCalendar = async (event: Event) => {
+  //       try {
+  //         const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({
+  //             userId: 'user-id', // Replace with the actual user ID
+  //             title: event.title,
+  //             date: event.date, // Assuming `start` holds the event date
+  //             description: event.description,
+  //             location: event.location,
+  //           }),
+  //         });
+    
+  //         if (!response.ok) {
+  //           throw new Error('Failed to add event to calendar');
+  //         }
+    
+  //         console.log(event.title);
+  //         const data = await response.json();
+  //         alert(`Event added successfully with ID: ${data.eventId}`);
+  //       } catch (error) {
+  //         console.error('Error adding event:', error);
+  //         alert('Failed to add event to calendar');
+  //       }
+  //     };
+
+
+  //     const addEventToCalendar1 = async (event: TopEvent) => {
+  //       try {
+  //         const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/add-event`, {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({
+  //             userId: 'user-id', // Replace with the actual user ID
+  //             title: event.title,
+  //             date: event.submission_period_dates, // Assuming `start` holds the event date
+  //             description: event.title,
+  //             location: event.displayed_location?.location,
+  //           }),
+  //         });
+    
+  //         if (!response.ok) {
+  //           throw new Error('Failed to add event to calendar');
+  //         }
+    
+  //         const data = await response.json();
+  //         alert(`Event added successfully with ID: ${data.eventId}`);
+  //       } catch (error) {
+  //         console.error('Error adding event:', error);
+  //         alert('Failed to add event to calendar');
+  //       }
+  //     };
+
+  // const handleAddToCalendar = async (hackathon: Event) => {
+  //   try {
+  //     const [startDate, endDateWithYear] = hackathon.date.split(' - ').map(date => date.trim());
+  //     const [endDate, endYear] = endDateWithYear.split(', ').map(date => date.trim());
+
+  //     const startDateTime = new Date(`${startDate}, ${endYear}`);
+  //     const endMonth = startDate.split(' ')[0]; // Extract the month from the startDate
+  //     const endDateTime = new Date(`${endMonth} ${endDate}, ${endYear}`);
+
+  //     if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+  //       throw new Error('Invalid date format');
+  //     }
+
+  //     const event = {
+  //       summary: hackathon.title,
+  //       description: hackathon.title,
+  //       start: {
+  //         dateTime: startDateTime.toISOString(),
+  //         timeZone: 'Asia/Almaty',
+  //       },
+  //       end: {
+  //         dateTime: endDateTime.toISOString(),
+  //         timeZone: 'Asia/Almaty',
+  //       },
+  //     };
+
+  //     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/google-auth/add-to-calendar`, { event }, {
+  //       withCredentials: true,
+  //     });
+
+  //     alert('Event added to Google Calendar');
+  //   } catch (error) {
+  //     console.error('Error adding to Google Calendar:', error);
+  //     alert('Failed to add event to Google Calendar');
+  //   }
+  // };
+
+  // const handleAddEventToCalendar = async (topEvent: TopEvent) => {
+  //   try {
+  //     const [startDate, endDateWithYear] = topEvent.submission_period_dates.split(' - ').map(date => date.trim());
+  //     const [endDate, endYear] = endDateWithYear.split(', ').map(date => date.trim());
+
+  //     const startDateTime = new Date(`${startDate}, ${endYear}`);
+  //     const endMonth = startDate.split(' ')[0]; // Extract the month from the startDate
+  //     const endDateTime = new Date(`${endMonth} ${endDate}, ${endYear}`);
+
+  //     if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+  //       throw new Error('Invalid date format');
+  //     }
+
+  //     const event = {
+  //       summary: topEvent.title,
+  //       description: topEvent.title,
+  //       start: {
+  //         dateTime: startDateTime.toISOString(),
+  //         timeZone: 'Asia/Almaty',
+  //       },
+  //       end: {
+  //         dateTime: endDateTime.toISOString(),
+  //         timeZone: 'Asia/Almaty',
+  //       },
+  //     };
+
+  //     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/google-auth/add-to-calendar`, { event }, {
+  //       withCredentials: true,
+  //     });
+
+  //     alert('Event added to Google Calendar');
+  //   } catch (error) {
+  //     console.error('Error adding to Google Calendar:', error);
+  //     alert('Failed to add event to Google Calendar');
+  //   }
+  // };
 
   return (
     <div>
@@ -732,7 +986,7 @@ const HackathonSearch: React.FC = () => {
             </div>
             <div className="flex gap-4 overflow-x-auto scrollbar-hide">
               {result.selectedEvents.map((event, index) => (
-                <div key={index} className="flex-shrink-0 w-[250px] md:w-[400px] h-[560px] rounded-b-lg md:h-[550px]">
+                <div key={index} className="flex-shrink-0 w-[280px] md:w-[400px] h-[560px] rounded-b-lg md:h-[550px]">
                   <Card className="h-full">
                     <Link href={event.url} className="relative h-[180px] md:h-[220px] overflow-hidden rounded-t-lg" prefetch={false}>
                       <img
@@ -768,11 +1022,11 @@ const HackathonSearch: React.FC = () => {
                       </Link>
 
                       <div className="flex gap-2 items-center">
-                        <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => handleAddToCalendar(event)}>
+                        <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => addEventToCalendar(event)}>
                           <CalendarIcon className="w-4 h-4 mr-2" />
                           Добавить в календарь
                         </Button>
-                        <Button variant="outline" size="sm" className="md:hidden" onClick={() => handleAddToCalendar(event)}>
+                        <Button variant="outline" size="sm" className="md:hidden" onClick={() => addEventToCalendar(event)}>
                           <CalendarIcon className="w-4 h-4" />
                         </Button>
                       </div>
@@ -792,18 +1046,18 @@ const HackathonSearch: React.FC = () => {
                 </div>
                 <div className="flex gap-4 overflow-x-auto scrollbar-hide">
                   {result.topEvents.map((event, index) => (
-                    <div key={index} className="flex-shrink-0 w-[250px] md:w-[380px] h-[500px]">
+                    <div key={index} className="flex-shrink-0 w-[280px] md:w-[380px] h-[450px]">
                       <Card className="h-full">
-                        <Link href={event.url} className="relative h-[180px] md:h-[220px] overflow-hidden rounded-t-lg" prefetch={false}>
+                        <Link href={event.url} className="relative h-[160px] md:h-[180px] overflow-hidden rounded-t-lg" prefetch={false}>
                           <img
                             src={event.thumbnail_url ? event.thumbnail_url.startsWith('//') ? `https:${event.thumbnail_url}` : event.thumbnail_url : '/assets/images/default-image.jpg'}
                             alt={event.title}
                             width={300}
                             height={200}
-                            className="h-[200px] w-full object-cover transition-all duration-300 group-hover:scale-105"
+                            className="h-[200px] w-full object-cover transition-all duration-300 group-hover:scale-105 rounded-t-lg"
                           />
                         </Link>
-                        <CardContent className="p-4 md:p-6 h-[238px] md:h-[230px] overflow-hidden">
+                        <CardContent className="p-4 md:p-6 h-[188px] md:h-[182px] overflow-hidden">
                           <div className="space-y-2">
                             <div className="font-semibold text-sm md:text-sm">{event.title}</div>
                             <div className="text-sm text-muted-foreground"><span>Дата: </span>{event.submission_period_dates || 'не указано'}</div>
@@ -829,11 +1083,11 @@ const HackathonSearch: React.FC = () => {
                           </Link>
 
                           <div className="flex gap-2 items-center">
-                            <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => handleAddEventToCalendar(event)}>
+                            <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => addEventToCalendar1(event)}>
                               <CalendarIcon className="w-4 h-4 mr-2" />
                               Добавить в календарь
                             </Button>
-                            <Button variant="outline" size="sm" className="md:hidden" onClick={() => handleAddEventToCalendar(event)}>
+                            <Button variant="outline" size="sm" className="md:hidden" onClick={() => addEventToCalendar1(event)}>
                               <CalendarIcon className="w-4 h-4" />
                             </Button>
                           </div>

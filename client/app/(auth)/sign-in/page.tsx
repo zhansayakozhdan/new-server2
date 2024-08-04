@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from "@/contexts/AuthContext";
 
 
 const Login = () => {
@@ -14,29 +15,34 @@ const Login = () => {
     const [password, setPassword] = useState('');
 
     const router = useRouter();
+    const { isAuthenticated, loginWithGoogle, logoutUser, loginUser } = useAuth();
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault(); // Prevent default form submission
       setLoading(true);
       try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/login`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ email, password }),
-              credentials: 'include' // Ensure cookies are included in the request
-          });
-          if (response.ok) {
-              // Handle successful login
-              console.log('User logged in successfully!');
-              const data = await response.json();
-              localStorage.setItem('accessToken', data.accessToken);
-              localStorage.setItem('refreshToken', data.refreshToken);
-              router.push('/');
-          } else {
-              console.error('Login failed:', await response.text());
-          }
+        //   const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/login`, {
+        //       method: 'POST',
+        //       headers: {
+        //           'Content-Type': 'application/json',
+        //       },
+        //       body: JSON.stringify({ email, password }),
+        //       credentials: 'include' // Ensure cookies are included in the request
+        //   });
+        //   if (response.ok) {
+        //       // Handle successful login
+        //       console.log('User logged in successfully!');
+        //       const data = await response.json();
+        //       localStorage.setItem('accessToken', data.accessToken);
+        //       localStorage.setItem('refreshToken', data.refreshToken);
+        //       router.push('/');
+        //   } else {
+        //       console.error('Login failed:', await response.text());
+        //   }
+
+        loginUser(email, password);
+        router.push('/');
+
       } catch (error) {
           console.error('Error during login:', error);
       } finally {
@@ -45,10 +51,12 @@ const Login = () => {
   };
 
 
-    const handleGoogleLogin = () => {
-        setLoading(true);
-        window.location.href = `${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`; // Replace with your actual Google OAuth endpoint
-    };
+//   const handleGoogleLogin = () => {
+//     setLoading(true);
+//     window.location.href = `${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`;
+// };
+
+
 
     return (
         <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -74,7 +82,7 @@ const Login = () => {
                     <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? 'Вход...' : 'Войти'}
                         </Button>
-                    <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+                    <Button variant="outline" className="w-full" onClick={loginWithGoogle} disabled={loading} type="button">
                         <ChromeIcon className="mr-2 h-4 w-4" />
                         {loading ? 'Вход...' : 'Войти через Google'}
                     </Button>

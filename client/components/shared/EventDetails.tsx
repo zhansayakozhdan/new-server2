@@ -29,7 +29,34 @@ interface Event {
   _id: string;
 }
 
-const EventDetails = ({ event }: { event: Event }) => {
+export interface Event1 {
+  _id: string;
+  title: string;
+  description?: string;
+  displayed_location?: {
+    location: string;
+  };
+  open_state?: boolean;
+  thumbnail_url?: string;
+  url?: string;
+  time_left_to_submission?: string;
+  submission_period_dates?: string;
+  themes?: { name: string }[];
+  prize_amount?: number;
+  registrations_count?: number;
+  featured?: boolean;
+  organization_name?: string;
+  winners_announced?: boolean;
+  submission_gallery_url?: string;
+  start_a_submission_url?: string;
+  invite_only?: boolean;
+  eligibility_requirement_invite_only_description?: string;
+  managed_by_devpost_badge?: boolean;
+  category?: string;
+}
+
+
+const EventDetails = ({ event }: { event: Event1 }) => {
   const [todoList, setTodoList] = useState<{ id: string; text: string; completed: boolean }[]>([]);
   const [newTask, setNewTask] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +64,7 @@ const EventDetails = ({ event }: { event: Event }) => {
   const fetchTodoList = async (eventId: string) => {
     setLoading(true);
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/query-todo`, { eventId });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/events/generate-todo`, { eventId });
       const todoString = response.data.todoList;
       const todoArray = todoString
         .split('\n')
@@ -74,51 +101,8 @@ const EventDetails = ({ event }: { event: Event }) => {
       <section className="py-12 md:py-24 lg:py-32 bg-muted">
         <div className="container px-4 md:px-6">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+
             <div className="grid gap-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">About the Hackathon</h2>
-              <p className="text-muted-foreground">
-                SummerHacks By YCW is an exciting hackathon that encourages participants to build innovative projects
-                using the latest technologies. With a focus on beginner-friendly, low/no-code, and open-ended themes,
-                this event is perfect for developers of all skill levels.
-              </p>
-              <p className="text-muted-foreground">
-                The hackathon is hosted by YCW, a leading organization dedicated to empowering the next generation of
-                technologists. Participants will have the opportunity to showcase their skills, network with industry
-                professionals, and compete for a total prize pool of $10,380.
-              </p>
-            </div>
-            <div className="grid gap-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Key Details</h2>
-              <div className="grid gap-2">
-                <div className="flex items-center gap-2">
-                  <CalendarIcon className="w-5 h-5" />
-                  <span className="font-medium">Submission Period:</span>
-                  <span>{event.submission_period_dates}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ClockIcon className="w-5 h-5" />
-                  <span className="font-medium">Time Left to Submit:</span>
-                  <span>{event.time_left_to_submission}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AwardIcon className="w-5 h-5" />
-                  <span className="font-medium">Total Prize:</span>
-                  <span>{event.prize_amount}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FlagIcon className="w-5 h-5" />
-                  <span className="font-medium">Event Status:</span>
-                  <span>Open</span>
-                </div>
-              </div>
-            </div>
-            <div className="grid gap-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Get Involved</h2>
-              <p className="text-muted-foreground">
-                If you&apos;re interested in participating in SummerHacks By YCW, visit the event website to learn more and
-                submit your project. You can also follow us on social media to stay up-to-date with the latest news
-                and updates.
-              </p>
               <div className="flex gap-2">
               <button
                   onClick={() => fetchTodoList(event._id)}
@@ -128,7 +112,7 @@ const EventDetails = ({ event }: { event: Event }) => {
                   Generate To-Do List
                 </button>
                 <Link
-                  href={event.url}
+                  href={event.url || '#'}
                   className="inline-flex h-10 items-center justify-center rounded-md bg-secondary px-6 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90 border"
                 >
                   Visit Website

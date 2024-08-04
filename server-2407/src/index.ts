@@ -30,40 +30,40 @@ app.use(cors({
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production' // Set secure cookies in production
+    secure: process.env.NODE_ENV === 'production'
   }
 }));
 
-//app.use(session({ secret: process.env.SESSION_SECRET!, resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use(express.json())
 app.use(logger)
 app.use('/api/v5', globalRouter)
 
 const server = createServer(app)
 
-cron.schedule('0 0 * * *', async () => {
-  console.log('Running scheduled tasks...');
+// cron.schedule('0 0 * * *', async () => {
+//   console.log('Running scheduled tasks...');
 
-  try {
-    console.log('Scheduler started.');
+//   try {
+//     console.log('Scheduler started.');
 
-    await devitParser();
-    await dataconnectorsParser();
-    //await devpostParser();
-    await telegramParser('https://t.me/s/hackathons');
-    await kzItEventsTgParser('https://t.me/s/kz_it_events');
-  } catch (error) {
-    console.error('Error running scheduled tasks:', error);
-  }
+//     await devitParser();
+//     await dataconnectorsParser();
+//     //await devpostParser();
+//     await telegramParser('https://t.me/s/hackathons');
+//     await kzItEventsTgParser('https://t.me/s/kz_it_events');
+//   } catch (error) {
+//     console.error('Error running scheduled tasks:', error);
+//   }
 
-  console.log('Scheduled tasks completed.');
-}, {
-  timezone: 'Asia/Almaty' // Adjust timezone as needed
-});
+//   console.log('Scheduled tasks completed.');
+// }, {
+//   timezone: 'Asia/Almaty' // Adjust timezone as needed
+// });
 
 
 server.listen(5002, () => {

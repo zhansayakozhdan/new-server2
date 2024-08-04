@@ -28,7 +28,8 @@ class AuthController {
         res.status(401).json({ message: 'Invalid email or password' })
         return
       }
-      res.status(200).json(result)
+      const { user, accessToken, refreshToken } = result;
+      res.status(200).json({ user, accessToken, refreshToken });
     } catch (err) {
       res.status(500).json({ message: 'Error logging in' })
     }
@@ -65,14 +66,38 @@ class AuthController {
       const user: IUser = await this.authService.getUserById(decodedRefresh.id);
       // Refresh token is valid, generate a new access token
       const newAccessToken = this.authService.generateJwt(user);
-      return res.json({ accessToken: newAccessToken, refreshToken });
+      return res.json({ accessToken: newAccessToken, refreshToken, user});
     }
 
     // Both tokens are invalid
     return res.status(401).json({ message: 'Invalid tokens' });
       
 };
+
+checkSession = async(req: Request, res: Response) => {
+  const { accessToken } = req.body;
+
+  if (!accessToken) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  try {
+    const user = await this.authService.verifyJwt(accessToken);;
+    res.status(200).json({
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+      },
+      accessToken, // Optional: Refresh or re-issue the token if needed
+    });
+  } catch (error) {
+    console.error('Error checking session:', error);
+    res.status(401).send('Unauthorized');
+  }
 }
 
-
+}
 export default AuthController
+
+

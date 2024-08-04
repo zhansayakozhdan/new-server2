@@ -106,12 +106,15 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const { isAuthenticated, loginWithGoogle, logoutUser, loginUser } = useAuth();
 
     const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission
@@ -138,9 +141,10 @@ const SignUp = () => {
         }
     };
 
-    const handleGoogleSignUp = () => {
-        window.location.href = `${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`;
-    };
+    // const handleGoogleSignUp = () => {
+    //     setLoading(true);
+    // window.location.href = `${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`;
+    // };
 
     return (
         <div className="flex justify-center items-center h-screen bg-background">
@@ -152,7 +156,7 @@ const SignUp = () => {
                 <form onSubmit={handleSignup}>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 gap-4">
-                        <Button variant="outline" onClick={handleGoogleSignUp}>
+                        <Button variant="outline" onClick={loginWithGoogle} type="button">
                             <ChromeIcon className="mr-2 h-4 w-4" />
                             продолжить с Google
                         </Button>

@@ -8,6 +8,15 @@ export interface IUser extends Document {
   googleId?: string;
 }
 
+export interface IUserWithTokens {
+  _id: string;
+  email: string;
+  username?: string;
+  googleId?: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
 const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   username: { type: String },

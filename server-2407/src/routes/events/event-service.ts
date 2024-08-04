@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
 import { MongoClient, ObjectId } from 'mongodb';
 import { createEmbedding } from '../../utils/createEmbeddings';
-import { hitOpenAiApi, hitOpenAiApiNew, hitOpenAiApiTest } from '../../openai';
+import { hitOpenAiApi, hitOpenAiApiNew, hitOpenAiApiTest, hitOpenAiApiTwo } from '../../openai';
 import { IEvent } from './models/Event';
+import { google, calendar_v3 } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 
 dotenv.config();
 
@@ -78,11 +80,99 @@ Please transform the unstructured information into the structured JSON format pr
 `;
 
 class EventService {
+  
   private client: MongoClient;
 
   constructor() {
-    this.client = new MongoClient(process.env.MONGODB_URL || 'mongodb://localhost:27017');
+    const uri = process.env.MONGODB_URL || 'mongodb://localhost:27017/main';
+    this.client = new MongoClient(uri, {
+      serverSelectionTimeoutMS: 5000, // Adjust the timeout as needed
+    });
   }
+
+
+  async addEventToCalendar(userId: string, eventDetails: { title: string; date: string; description: string; location: string; }): Promise<string> {
+    try {
+        console.log('Connecting to the database...');
+        await this.client.connect();
+        const db = this.client.db('main');
+
+        console.log('Fetching user details...');
+        const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+
+        console.log('Fetching token...');
+        const token = await db.collection('refreshtokens').findOne({ user: new ObjectId(userId) });
+
+        if (!user || !token) {
+            throw new Error('User not authenticated or access token missing');
+        }
+
+        console.log('User:', user);
+        console.log('Token:', token);
+
+        console.log('Setting up Google Calendar API client...');
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            `${process.env.SERVER_API_URL}/api/v5/auth/google/callback`
+        );
+        
+        // Set initial credentials
+        oauth2Client.setCredentials({
+            access_token: token.accessToken,
+            refresh_token: token.token,
+        });
+
+        // Refresh the access token
+        await oauth2Client.getAccessToken(); // This will automatically refresh the token if needed
+
+        const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+        console.log('Parsing event date...');
+        const [day, month, year] = eventDetails.date.split('.').map(Number);
+        const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+        const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59));
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error('Invalid date format');
+        }
+
+        const event = {
+            summary: eventDetails.title,
+            description: eventDetails.description,
+            location: eventDetails.location,
+            start: {
+                dateTime: startDate.toISOString(),
+                timeZone: 'Asia/Almaty',
+            },
+            end: {
+                dateTime: endDate.toISOString(),
+                timeZone: 'Asia/Almaty',
+            },
+        };
+
+        console.log('Calling Google Calendar API...');
+        const response = await calendar.events.insert({
+            calendarId: 'primary',
+            requestBody: event,
+        });
+
+        if (!response.data.id) {
+            throw new Error('Event ID not found in the response');
+        }
+
+        console.log('Event added successfully with ID:', response.data.id);
+        return response.data.id;
+    } catch (error) {
+        console.error('Error adding event to calendar:', error);
+        throw new Error('Failed to add event to calendar');
+    } finally {
+        console.log('Closing database connection...');
+        await this.client.close();
+    }
+}
+
+
 
   async getAllEvents(page: number, limit: number) {
     const skip = (page - 1) * limit;
@@ -111,9 +201,7 @@ class EventService {
     } catch (err) {
       console.error('Error fetching events:', err);
       throw new Error('Internal server error');
-    } finally {
-      await this.client.close();
-    }
+    } 
   }
 
   async getEventById(eventId: string) {
@@ -133,9 +221,7 @@ class EventService {
     } catch (err) {
       console.error('Error fetching event by ID:', err);
       throw new Error('Internal server error');
-    } finally {
-      await this.client.close();
-    }
+    } 
   }
 
   async getEventByUrl(eventUrl: string) {
@@ -155,9 +241,7 @@ class EventService {
     } catch (err) {
       console.error('Error fetching event by URL:', err);
       throw new Error('Internal server error');
-    } finally {
-      await this.client.close();
-    }
+    } 
   }
 
 
@@ -285,7 +369,7 @@ async getTopEvents(query: string) {
       {
         '$vectorSearch': {
           'index': 'default',
-          'path': 'embedding',
+          'path': 'embeddings',
           'queryVector': embedding,
           'numCandidates': 150,
           'limit': 15
@@ -326,9 +410,7 @@ async getTopEvents(query: string) {
   } catch (err) {
     console.error('Error fetching top events:', err);
     throw new Error('Internal server error');
-  } finally {
-    await this.client.close();
-  }
+  } 
 }
 
 async getSuitableEvents(query: string) {
@@ -365,9 +447,36 @@ async getSuitableEvents(query: string) {
   }
 }
 
-  
-  
-}
 
+
+public async generateTodoList(eventId: string): Promise<string> {
+  try {
+    await this.client.connect();
+    const db = this.client.db('main');
+    const collection = db.collection('events');
+
+    const hackathon = await collection.findOne({ _id: new ObjectId(eventId) });
+    if (!hackathon) {
+      throw new Error('Hackathon not found');
+    }
+
+    const prompt = `Составь подробный список дел для участия в следующем хакатоне: ${hackathon.title}.
+    Правила хакатона: ${hackathon.description}.
+    
+    Список дел должен включать:
+    Подготовку до начала хакатона, с указанием дедлайнов (например, регистрация, сбор команды, изучение темы).
+    Задачи на время хакатона, с указанием сроков выполнения (например, разработка идеи, программирование, тестирование).
+    Завершение хакатона, с указанием конечных сроков (например, подготовка презентации, подача проекта).
+    
+    Пожалуйста, предоставь подробный и организованный список дел с указанием дедлайнов для успешного участия в хакатоне.`;
+
+    const todoList = await hitOpenAiApiTwo(prompt);
+    return todoList || '';
+  } catch (err) {
+    console.error('Error generating TO-DO list:', err);
+    throw new Error('Internal server error');
+  } 
+}
+}
 
 export default EventService;

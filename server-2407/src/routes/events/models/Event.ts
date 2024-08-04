@@ -42,6 +42,7 @@ export interface IEvent {
     createdAt?: Date;
     updatedAt?: Date;
     embedding: number[];
+    embeddings: number[];
   }
   
 
@@ -89,6 +90,7 @@ const EventSchema = new Schema<IEvent>({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   embedding: [Number],
+  embeddings: [Number],
 });
 
 const Event = model<IEvent>('Event', EventSchema);
