@@ -21,7 +21,7 @@ connectDB()
 const app = express()
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://new-server2.vercel.app/', 
+  origin: process.env.FRONTEND_URL || 'https://techeventsai.vercel.app', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'], 
   credentials: true 
