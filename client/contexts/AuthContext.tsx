@@ -167,6 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const loginWithGoogle = async () => {
     window.location.href = `${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`;
+    console.log(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/auth/google`);
   }
 
 
